@@ -99,7 +99,9 @@ I use four method for augment my poor data
 
 For the preprocessing I used YUV filter and I resize it
 
-- ### YUV [Opencv][link1]
+- ### YUV  
+
+    [Opencv Doc rgb to yuv][link1]
 
     ![alt text][image8] I change the color space to Y U V, it is much lighter and really easy to used
 
@@ -189,4 +191,4 @@ def nvidia_model():
 
 
 [Video mp4][video1]
-[YouTube Link][video2]
+[YouTube Link][video2]{:target="_blank"}
