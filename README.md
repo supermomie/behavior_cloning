@@ -14,6 +14,7 @@
 [image10]: ./demo/generator.png "generator"
 [image11]: ./demo/summary.png "summary"
 [image12]: ./demo/tensorboardMainGraph_1.png "graph"
+[image13]: ./demo/plttrainvalid.png "plt_valid&train"
 [link1]: https://docs.opencv.org/ref/2.4.13.3/d0/de9/structcv_1_1gpu_1_1device_1_1color__detail_1_1RGB2YUV.html "RGB2YUV"
 
 # README
@@ -183,6 +184,8 @@ def nvidia_model():
 
 
 ![alt text][image11]
+
+![alt text][image13]
 
 ![alt text][image12]
 
