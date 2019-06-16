@@ -13,7 +13,7 @@ import cv2
 sio = socketio.Server()
  
 app = Flask(__name__) #'__main__'
-speed_limit = 50
+speed_limit = 30
 def img_preprocess(img):
     img = img[60:135,:,:]
     img = cv2.cvtColor(img, cv2.COLOR_RGB2YUV)
@@ -32,7 +32,7 @@ def telemetry(sid, data):
     image = np.array([image])
     steering_angle = float(model.predict(image))
     throttle = 1.0 - speed/speed_limit
-    print('ANGLE:{} THROTTLE:{:.3f} SPEED:{:.1f}'.format(steering_angle, throttle*100, speed))
+    print('ANGLE:{:.3f} THROTTLE:{:.3f} SPEED:{:.1f}'.format(steering_angle, throttle*100, speed))
     send_control(steering_angle, throttle)
     # save frame
     timestamp = datetime.utcnow().strftime('%Y_%m_%d_%H_%M_%S_%f')[:-3]
