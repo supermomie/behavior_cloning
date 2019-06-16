@@ -1,7 +1,7 @@
 [//]: # (Image References)
 
 [video1]: ./output_vid/output_vid.mp4 "videomp4"
-[video2]: https://www.youtube.com/watch?v=T9FdAELz1KA target="_blank" "videoYT"
+[video2]: https://www.youtube.com/watch?v=T9FdAELz1KA "videoYT"
 [image1]: ./demo/plthist.png "Collecte"
 [image2]: ./demo/plthistremoved.png "Balance"
 [image3]: ./demo/trainandvalid.png "Train&Valid"
@@ -99,7 +99,9 @@ I use four method for augment my poor data
 
 For the preprocessing I used YUV filter and I resize it
 
-- ### YUV [Opencv DOC Y U V][link1]
+- ### YUV  
+
+    [Opencv DOC Y U V][link1]
 
     ![alt text][image8] I change the color space to Y U V, it is much lighter and really easy to used
 
