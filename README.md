@@ -33,7 +33,7 @@ In summary I did 3 laps (track 1) in both directions.
 
 
 # Balancing Data
-This plot indicate the number of times the steering angle are used and the angle for each one.
+This plot indicates the number of times the steering angle are used and the corresponding angle for each one.
 As we can see we have unbalance data, so we need to balance it.
 
 
@@ -48,7 +48,7 @@ If I were to train our convolutional neural network based on this data then the 
 
 
 # Augmentation Data
-I use four method for augment my poor data
+I use four methods for augment my poor data
 
 - ### Zoom
 
@@ -120,7 +120,7 @@ For the preprocessing I used YUV filter and I resize it
 
 # Batch Generator
 
-My generator will take input data create a defined number of augmented sample images along with labels and then returns these augmented images with their respective labels.
+My generator will take input to data create a defined number of augmented sample images along with labels and then returns these augmented images with their respective labels.
 The main benefit of the generator is that it can create augmented images on the fly rather than augmenting all my images at one time and storing them using valuable memory space.
 
 ```python
