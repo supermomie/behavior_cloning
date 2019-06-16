@@ -1,5 +1,7 @@
 [//]: # (Image References)
 
+[video1]: ./output_vid/output_vid.mp4 "videomp4"
+[video2]: https://www.youtube.com/watch?v=T9FdAELz1KA "videoYT"
 [image1]: ./demo/plthist.png "Collecte"
 [image2]: ./demo/plthistremoved.png "Balance"
 [image3]: ./demo/trainandvalid.png "Train&Valid"
@@ -11,7 +13,8 @@
 [image9]: ./demo/resizeandpreproc.png "resizeandpreproc"
 [image10]: ./demo/generator.png "generator"
 [image11]: ./demo/summary.png "summary"
-
+[image12]: ./demo/tensorboardMainGraph_1.png "graph"
+[link1]: "https://docs.opencv.org/ref/2.4.13.3/d0/de9/structcv_1_1gpu_1_1device_1_1color__detail_1_1RGB2YUV.html" "RGB2YUV"
 
 # README
 
@@ -23,37 +26,100 @@
 - Simulator for Mac OS [https://d17h27t6h515a5.cloudfront.net/topher/2017/February/58ae4594_mac-sim.app/mac-sim.app.zip](https://d17h27t6h515a5.cloudfront.net/topher/2017/February/58ae4594_mac-sim.app/mac-sim.app.zip)
 - Simulator for windows OS [https://d17h27t6h515a5.cloudfront.net/topher/2017/February/58ae4419_windows-sim/windows-sim.zip](https://d17h27t6h515a5.cloudfront.net/topher/2017/February/58ae4419_windows-sim/windows-sim.zip)
 # Collecting Data
-For my collecting data I did 3 laps (track 1) in both directions.
+
+For my first collecting, I recorded 3 laps, but after training and test in autonomus mode I realized the car make only left turn, so to overcome this problem I need collect 3 other laps in the reverse.
+
+In summary I did 3 laps (track 1) in both directions.
+
+
+# Balancing Data
+This plot indicate the number of times the steering angle are used and the angle for each one.
+As we can see we have unbalance data, so we need to balance it.
+
 
 ![alt text][image1]
-# Balancing Data
 
 If I were to train our convolutional neural network based on this data then the model could become biased towards driving straight all the time. So I must flatten the data distribution and cut off extraneous samples for specific bins whose frequency exceed 400.
 
 ![alt text][image2]
 
-# Training & Validation Split
 
-![alt text][image3]
+
+
 
 # Augmentation Data
+I use four method for augment my poor data
 
 - ### Zoom
-    ![alt text][image4]
+
+```python
+    def zoom(image):
+        zoom = iaa.Affine(scale=(1, 1.3))
+        image = zoom.augment_image(image)
+        return image
+```
+![alt text][image4]
+
+
 - ### pan
-    ![alt text][image5]
+```python
+    def pan(image):
+      pan = iaa.Affine(translate_percent= {"x" : (-0.1, 0.1), "y": (-0.1, 0.1)})
+      image = pan.augment_image(image)
+      return image
+```
+![alt text][image5]
+
+
 - ### brigth
-    ![alt text][image6]
+
+```python
+    def img_random_brightness(image):
+        brightness = iaa.Multiply((0.2, 1.2))
+        image = brightness.augment_image(image)
+        return image
+```
+![alt text][image6]
+
+
+
 - ### flip
-    ![alt text][image7]
+
+```python
+    def flip(image, steering_angle):
+        image = cv2.flip(image,1)
+        steering_angle = -steering_angle
+        return image, steering_angle
+```
+![alt text][image7]
+
+
 
 # Preprocessing
-- ### YUV
-    ![alt text][image8]
+
+For the preprocessing I used YUV filter and I resize it
+
+- ### YUV [Opencv][link1]
+
+    ![alt text][image8] I change the color space to Y U V, it is much lighter and really easy to used
+
+    ```
+    cv2.cvtColor(img, cv2.COLOR_RGB2YUV)
+    ```
+
 - ### Resize
+
     ![alt text][image9]
 
+    ```
+    cv2.resize(img, (200, 66))
+    ```
+    I decide de resize because this will allow for faster computations as a smaller image is easier to work with.
+
 # Batch Generator
+
+My generator will take input data create a defined number of augmented sample images along with labels and then returns these augmented images with their respective labels.
+The main benefit of the generator is that it can create augmented images on the fly rather than augmenting all my images at one time and storing them using valuable memory space.
 
 ```python
 def batch_generator(image_paths, steering_ang, batch_size, istraining):
@@ -84,6 +150,7 @@ x_valid_gen, y_valid_gen = next(batch_generator(X_valid, y_valid, 1, 0))
 
 ![alt text][image10]
 
+![alt text][image3]
 # NVIDIA model
 
 
@@ -114,8 +181,11 @@ def nvidia_model():
 
 ![alt text][image11]
 
+![alt text][image12]
+
 
 # Result
 
 
-[YouTube Link](https://www.youtube.com/watch?v=T9FdAELz1KA)
+[Video mp4][video1]
+[YouTube Link][video2]
