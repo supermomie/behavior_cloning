@@ -1,7 +1,7 @@
 [//]: # (Image References)
 
 [video1]: ./output_vid/output_vid.mp4 "videomp4"
-[video2]: https://www.youtube.com/watch?v=T9FdAELz1KA "videoYT"
+[video2]: https://www.youtube.com/watch?v=T9FdAELz1KA target="_blank" "videoYT"
 [image1]: ./demo/plthist.png "Collecte"
 [image2]: ./demo/plthistremoved.png "Balance"
 [image3]: ./demo/trainandvalid.png "Train&Valid"
@@ -14,7 +14,7 @@
 [image10]: ./demo/generator.png "generator"
 [image11]: ./demo/summary.png "summary"
 [image12]: ./demo/tensorboardMainGraph_1.png "graph"
-[link1]: "https://docs.opencv.org/ref/2.4.13.3/d0/de9/structcv_1_1gpu_1_1device_1_1color__detail_1_1RGB2YUV.html" "RGB2YUV"
+[link1]: https://docs.opencv.org/ref/2.4.13.3/d0/de9/structcv_1_1gpu_1_1device_1_1color__detail_1_1RGB2YUV.html "RGB2YUV"
 
 # README
 
@@ -99,9 +99,7 @@ I use four method for augment my poor data
 
 For the preprocessing I used YUV filter and I resize it
 
-- ### YUV  
-
-    [Opencv Doc rgb to yuv][link1]
+- ### YUV [Opencv DOC Y U V][link1]
 
     ![alt text][image8] I change the color space to Y U V, it is much lighter and really easy to used
 
@@ -191,4 +189,4 @@ def nvidia_model():
 
 
 [Video mp4][video1]
-[YouTube Link][video2]{:target="_blank"}
+[YouTube Link][video2]
