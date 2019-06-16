@@ -163,13 +163,10 @@ def nvidia_model():
     model.add(Flatten())
   
     model.add(Dense(100, activation = 'elu'))
-    #model.add(Dropout(0.5))
   
     model.add(Dense(50, activation = 'elu'))
-    #model.add(Dropout(0.5))
   
     model.add(Dense(10, activation = 'elu'))
-    #model.add(Dropout(0.5))
  
     model.add(Dense(1))
   
@@ -177,21 +174,18 @@ def nvidia_model():
     model.compile(loss='mse', optimizer=optimizer)
     return model
 
-def my_model():
-    model = Sequential()
-    model.add()
-
-
 
 from keras.callbacks import ModelCheckpoint
 
 checkpointer = ModelCheckpoint(filepath='./checkpoint/weights.h5', verbose=1, save_best_only=True)
 model = nvidia_model()
+logdir="logs/fit/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = keras.callbacks.TensorBoard(log_dir=logdir)
+
 print(model.summary())
 
 
-logdir="logs/fit/" + datetime.now().strftime("%Y%m%d-%H%M%S")
-tensorboard_callback = keras.callbacks.TensorBoard(log_dir=logdir)
+
 
 history = model.fit_generator(batch_generator(X_train, y_train, 100, 1),
                                   steps_per_epoch=300, 
