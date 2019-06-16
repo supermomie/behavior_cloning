@@ -2,6 +2,7 @@ import os
 import numpy as np
 import keras
 from keras.models import Sequential
+from datetime import datetime
 import matplotlib.image as mpimg
 from keras.optimizers import Adam
 from keras.layers import Convolution2D, MaxPooling2D, Dropout, Flatten, Dense
@@ -87,13 +88,13 @@ def pan(image):
     return image
 
 
-def img_random_brightness(image):
+def bright(image):
     brightness = iaa.Multiply((0.2, 1.2))
     image = brightness.augment_image(image)
     return image
 
 
-def img_random_flip(image, steering_angle):
+def flip(image, steering_angle):
     image = cv2.flip(image,1)
     steering_angle = -steering_angle
     return image, steering_angle
@@ -107,9 +108,9 @@ def random_augment(image, steering_angle):
     if np.random.rand() < 0.5:
       image = zoom(image)
     if np.random.rand() < 0.5:
-      image = img_random_brightness(image)
+      image = bright(image)
     if np.random.rand() < 0.5:
-      image, steering_angle = img_random_flip(image, steering_angle)
+      image, steering_angle = flip(image, steering_angle)
     
     return image, steering_angle
 
@@ -118,10 +119,11 @@ def random_augment(image, steering_angle):
 def img_preprocess(img):
     img = img[60:135,:,:]
     img = cv2.cvtColor(img, cv2.COLOR_RGB2YUV)
+    y, u, v = cv2.split(img)
     img = cv2.GaussianBlur(img,  (3, 3), 0)
     img = cv2.resize(img, (200, 66))
     img = img/255
-    return img
+    return img, y, u, v
 
 
 
@@ -141,7 +143,7 @@ def batch_generator(image_paths, steering_ang, batch_size, istraining):
                 im = mpimg.imread(image_paths[random_index])
                 steering = steering_ang[random_index]
 
-            im = img_preprocess(im)
+            im, _, _, _ = img_preprocess(im)
             batch_img.append(im)
             batch_steering.append(steering)
         yield (np.asarray(batch_img), np.asarray(batch_steering))  
@@ -179,10 +181,17 @@ def my_model():
     model = Sequential()
     model.add()
 
+
+
+from keras.callbacks import ModelCheckpoint
+
+checkpointer = ModelCheckpoint(filepath='./checkpoint/weights.h5', verbose=1, save_best_only=True)
 model = nvidia_model()
 print(model.summary())
 
 
+logdir="logs/fit/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = keras.callbacks.TensorBoard(log_dir=logdir)
 
 history = model.fit_generator(batch_generator(X_train, y_train, 100, 1),
                                   steps_per_epoch=300, 
@@ -190,7 +199,8 @@ history = model.fit_generator(batch_generator(X_train, y_train, 100, 1),
                                   validation_data=batch_generator(X_valid, y_valid, 100, 0),
                                   validation_steps=200,
                                   verbose=1,
-                                  shuffle = 1)
+                                  shuffle=1,
+                                  callbacks=[checkpointer, tensorboard_callback])
 
 
 model.save('modelL.h5')
