@@ -154,6 +154,7 @@ x_valid_gen, y_valid_gen = next(batch_generator(X_valid, y_valid, 1, 0))
 # NVIDIA model
 
 
+
 ```python
 def nvidia_model():
     
