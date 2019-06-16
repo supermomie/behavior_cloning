@@ -197,4 +197,4 @@ history = model.fit_generator(batch_generator(X_train, y_train, 100, 1),
                                   callbacks=[checkpointer, tensorboard_callback])
 
 
-model.save('modelL.h5')
+model.save('model.h5')
