@@ -77,24 +77,40 @@ print('Training Samples: {}\nValid Samples: {}'.format(len(X_train), len(X_valid
 
 
 def zoom(image):
+    """
+    return zoomed image |1-1.3|
+    """
+
     zoom = iaa.Affine(scale=(1, 1.3))
     image = zoom.augment_image(image)
     return image
 
 
 def pan(image):
+    """
+    return image displace
+    """
+
     pan = iaa.Affine(translate_percent= {"x" : (-0.1, 0.1), "y": (-0.1, 0.1)})
     image = pan.augment_image(image)
     return image
 
 
 def bright(image):
+    """
+    return image more or less bright
+    """
+
     brightness = iaa.Multiply((0.2, 1.2))
     image = brightness.augment_image(image)
     return image
 
 
 def flip(image, steering_angle):
+    """
+    return flipped image with steering angle
+    """
+
     image = cv2.flip(image,1)
     steering_angle = -steering_angle
     return image, steering_angle
@@ -102,6 +118,10 @@ def flip(image, steering_angle):
 
 
 def random_augment(image, steering_angle):
+    """
+    return randmonly augment image & steering angle
+    """
+
     image = mpimg.imread(image)
     if np.random.rand() < 0.5:
       image = pan(image)
@@ -117,24 +137,38 @@ def random_augment(image, steering_angle):
 
 
 def img_preprocess(img):
-    img = img[60:135,:,:]
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2YUV)
-    y, u, v = cv2.split(img)
-    img = cv2.GaussianBlur(img,  (3, 3), 0)
-    img = cv2.resize(img, (200, 66))
-    img = img/255
+    """
+    input image
+    1 - image cropped
+    2 - changing the color map (YUV)
+    3 - split the filter
+    4 - reduce noise
+    5 - resize the image
+    6 - divide by 255 to normalize
+    return the image preprocessed and 3 YUV filters
+
+    """
+
+    img = img[60:135,:,:] #bellow 60 and over 135
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2YUV) # change cmap
+    y, u, v = cv2.split(img) # split filter
+    img = cv2.GaussianBlur(img,  (3, 3), 0) # reduce noise
+    img = cv2.resize(img, (200, 66)) # resize
+    img = img/255 # normalization
     return img, y, u, v
 
 
-
 def batch_generator(image_paths, steering_ang, batch_size, istraining):
+    """
+    input image, steering batchsize (100), istraining (boolean)
+    """
 
     while True:
         batch_img = []
         batch_steering = []
 
         for i in range(batch_size):
-            random_index = random.randint(0, len(image_paths) - 1)
+            random_index = random.randint(0, len(image_paths) - 1) # random int between 0 and total image
 
             if istraining:
                 im, steering = random_augment(image_paths[random_index], steering_ang[random_index])
@@ -146,48 +180,57 @@ def batch_generator(image_paths, steering_ang, batch_size, istraining):
             im, _, _, _ = img_preprocess(im)
             batch_img.append(im)
             batch_steering.append(steering)
-        yield (np.asarray(batch_img), np.asarray(batch_steering))  
+        yield (np.asarray(batch_img), np.asarray(batch_steering))
         
 
+x = np.array(list(map(img_preprocess, X_train)))
+print(x.shape)
+x_train_gen, y_train_gen = next(batch_generator(X_train, y_train, 1, 1))
+x_valid_gen, y_valid_gen = next(batch_generator(X_valid, y_valid, 1, 0))
 
 def nvidia_model():
+    """
+    Using NVIDIA model, the normalization (img_preprocess func) is out of my model
+    """
+
     model = Sequential()
-    model.add(Convolution2D(24, 5, 5, subsample=(2, 2), input_shape=(66, 200, 3), activation='elu'))
-    model.add(Convolution2D(36, 5, 5, subsample=(2, 2), activation='elu'))
-    model.add(Convolution2D(48, 5, 5, subsample=(2, 2), activation='elu'))
-    model.add(Convolution2D(64, 3, 3, activation='elu'))
-    model.add(Convolution2D(64, 3, 3, activation='elu'))
-    model.add(Dropout(.9))
+    model.add(Convolution2D(24, 5, 5, subsample=(2, 2), input_shape=(66, 200, 3), activation='elu')) # conv2d_1
+    model.add(Convolution2D(36, 5, 5, subsample=(2, 2), activation='elu')) # conv2d_2
+    model.add(Convolution2D(48, 5, 5, subsample=(2, 2), activation='elu')) # conv2d_3
+    model.add(Convolution2D(64, 3, 3, activation='elu')) # conv2d_4
+    model.add(Convolution2D(64, 3, 3, activation='elu')) # conv2d_5
+    model.add(Dropout(.9)) # dropout at 0.9
   
   
-    model.add(Flatten())
+    model.add(Flatten()) # flatten
   
-    model.add(Dense(100, activation = 'elu'))
+    model.add(Dense(100, activation = 'elu')) # dense_1
   
-    model.add(Dense(50, activation = 'elu'))
+    model.add(Dense(50, activation = 'elu')) # dense_2
   
-    model.add(Dense(10, activation = 'elu'))
+    model.add(Dense(10, activation = 'elu')) # dense_3
  
-    model.add(Dense(1))
+    model.add(Dense(1)) # dense_4
   
-    optimizer = Adam(lr=1e-3)
+    optimizer = Adam(lr=1e-3) # learning rate 0.001
     model.compile(loss='mse', optimizer=optimizer)
     return model
 
 
 from keras.callbacks import ModelCheckpoint
 
+
 checkpointer = ModelCheckpoint(filepath='./checkpoint/weights.h5', verbose=1, save_best_only=True)
-model = nvidia_model()
 logdir="logs/fit/" + datetime.now().strftime("%Y%m%d-%H%M%S")
-tensorboard_callback = keras.callbacks.TensorBoard(log_dir=logdir)
+tensorboard_callback = keras.callbacks.TensorBoard(log_dir=logdir) # cmd = tensorboard --logdir logs
+
+
+
+model = nvidia_model()
 
 print(model.summary())
 
-
-
-
-history = model.fit_generator(batch_generator(X_train, y_train, 100, 1),
+model.fit_generator(batch_generator(X_train, y_train, 100, 1),
                                   steps_per_epoch=300, 
                                   epochs=10,
                                   validation_data=batch_generator(X_valid, y_valid, 100, 0),
@@ -197,4 +240,4 @@ history = model.fit_generator(batch_generator(X_train, y_train, 100, 1),
                                   callbacks=[checkpointer, tensorboard_callback])
 
 
-model.save('model.h5')
+model.save('model.h5') # saving model
