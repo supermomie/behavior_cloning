@@ -75,7 +75,7 @@ I use four methods for augment my poor data
 - ### brigth
 
 ```python
-    def img_random_brightness(image):
+    def bright(image):
         brightness = iaa.Multiply((0.2, 1.2))
         image = brightness.augment_image(image)
         return image
