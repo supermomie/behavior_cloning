@@ -32,7 +32,6 @@ samples_per_bin = 400
 hist, bins = np.histogram(data['steering'], num_bins)
 center = (bins[:-1]+ bins[1:]) * 0.5
 
-
 print('total data:', len(data))
 remove_list = []
 for j in range(num_bins):
@@ -183,8 +182,6 @@ def batch_generator(image_paths, steering_ang, batch_size, istraining):
         yield (np.asarray(batch_img), np.asarray(batch_steering))
         
 
-x = np.array(list(map(img_preprocess, X_train)))
-print(x.shape)
 x_train_gen, y_train_gen = next(batch_generator(X_train, y_train, 1, 1))
 x_valid_gen, y_valid_gen = next(batch_generator(X_valid, y_valid, 1, 0))
 
